@@ -1,3 +1,4 @@
+const { getAddressInfo } = require('bitcoin-address-validation')
 const notify = require('../../db/notify');
 const {
     SUCCESS,
@@ -11,7 +12,7 @@ module.exports = async (req_, res_) => {
         const ordWallet = req_.body.ordWallet;
         const removeAll = req_.body.removeAll;
 
-        if (!ordWallet) {
+        if (!ordWallet || !getAddressInfo(ordWallet).bech32) {
             console.log("Request params failed");
             return res_.send({ result: false, status: FAIL, message: "Request params failed" });
         }
@@ -27,23 +28,22 @@ module.exports = async (req_, res_) => {
             }
             console.log("Remove all success");
             return res_.send({ status: SUCCESS, message: "Remove all success" });
-        }
-        // else {
-        //     const _updateResult = await notify.updateOne({
-        //         ordWallet: ordWallet,
-        //         type: type,
-        //         title: title,
-        //         link: link,
-        //         content: content,
-        //         notifyDate: notifyDate,
-        //         active: true
-        //     }, { active: false });
+        } else {
+            const _updateResult = await notify.updateOne({
+                ordWallet: ordWallet,
+                type: type,
+                title: title,
+                link: link,
+                content: content,
+                notifyDate: notifyDate,
+                active: true
+            }, { active: false });
 
-        //     if (!_updateResult) {
-        //         return res_.send({ status: FAIL, message: "remove one fail!" });
-        //     }
-        //     return res_.send({ status: SUCCESS, message: "remove one success" });
-        // }
+            if (!_updateResult) {
+                return res_.send({ status: FAIL, message: "remove one fail!" });
+            }
+            return res_.send({ status: SUCCESS, message: "remove one success" });
+        }
     } catch (error) {
         console.log('remove notify catch error: ', error)
         return res_.send({ status: FAIL, message: "Catch Error" });

@@ -1,3 +1,4 @@
+const { getAddressInfo } = require('bitcoin-address-validation')
 const inscribe = require("../../db/inscribe");
 const awaitExec = require("util").promisify(require("child_process").exec);
 const {
@@ -31,7 +32,7 @@ module.exports = async (req_, res_) => {
     console.log("feeRate: ", feeRate, !feeRate);
     console.log("actionDate: ", actionDate, !actionDate);
     console.log("btcAccount: ", btcAccount, !btcAccount);
-    if (!ordWallet || !feeRate || !actionDate || !btcAccount || filePaths.length === 0) {
+    if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !feeRate || !actionDate || !btcAccount || filePaths.length === 0) {
       console.log("request params fail");
       if (filePaths.length > 0) {
         for (var index = 0; index < filePaths.length; index++) {

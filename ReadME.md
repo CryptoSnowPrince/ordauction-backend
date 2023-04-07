@@ -1,28 +1,24 @@
-# ordinalart-inscribe-backend
+# ordauction-backend
 
 ## API_URL
 
 ```text
-https://inscribe.ordinal.art/api
+https://ordauction.org/api
 ```
 
 ## API_LIST
 
 ```text
 POST
-https://inscribe.ordinal.art/api/users/getUserInfo
+/users/getUserInfo
 ordWallet: string
 actionDate: date
  
-POST
-https://inscribe.ordinal.art/api/users/getUserInscriptions
-ordWallet: string
-
 GET
-https://inscribe.ordinal.art/api/users/getNotify?ordWallet=ordWallet
+/users/getNotify?ordWallet=ordWallet
 
 POST
-https://inscribe.ordinal.art/api/users/removeNotify
+/users/removeNotify
 ordWallet: ordWallet
 removeAll: false(one)/true(multiple)
 type: Number

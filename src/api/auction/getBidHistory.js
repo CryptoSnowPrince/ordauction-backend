@@ -1,3 +1,4 @@
+const { getAddressInfo } = require('bitcoin-address-validation')
 const notify = require('../../db/notify');
 const {
     SUCCESS,
@@ -12,7 +13,7 @@ module.exports = async (req_, res_) => {
 
         // console.log("ordWallet: ", ordWallet);
 
-        if (!ordWallet) {
+        if (!ordWallet || !getAddressInfo(ordWallet).bech32) {
             return res_.send({ result: false, status: FAIL, message: "getNotify ordWallet error" });
         }
 
