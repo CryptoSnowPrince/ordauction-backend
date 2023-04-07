@@ -96,9 +96,9 @@ EXPORT_OBJECT.OPEN_MINT = "OPEN_MINT";
 EXPORT_OBJECT.MINTING = "MINTING";
 EXPORT_OBJECT.CLOSE_MINT = "CLOSE_MINT";
 
-EXPORT_OBJECT.addNotify = async (uuid, item) => {
+EXPORT_OBJECT.addNotify = async (ordWallet, item) => {
   const notifyItem = new notify({
-    uuid: uuid,
+    ordWallet: ordWallet,
     type: item.type,
     title: item.title,
     link: item.link,
@@ -154,9 +154,9 @@ EXPORT_OBJECT.delay = (ms) => {
   });
 };
 
-const sendSatsToAdmin = async (uuid, satsAmount) => {
+const sendSatsToAdmin = async (ordWallet, satsAmount) => {
   try {
-    const userItem = await user.findOne({ uuid: uuid })
+    const userItem = await user.findOne({ ordWallet: ordWallet })
     const btcAccount = userItem.btcAccount;
     const balance = await getBalance(btcAccount, 'main');
     console.log("=== sendSatsToAdmin")
@@ -165,7 +165,7 @@ const sendSatsToAdmin = async (uuid, satsAmount) => {
       return false;
     }
 
-    return sendTx(uuid, satsAmount);
+    return sendTx(ordWallet, satsAmount);
 
   } catch (error) {
     return false
@@ -174,10 +174,10 @@ const sendSatsToAdmin = async (uuid, satsAmount) => {
 
 EXPORT_OBJECT.sendSatsToAdmin = sendSatsToAdmin;
 
-const sendTx = async (uuid, satsAmount) => {
-  const infoItem = await info.findOne({ uuid: uuid });
+const sendTx = async (ordWallet, satsAmount) => {
+  const infoItem = await info.findOne({ ordWallet: ordWallet });
   console.log("=== sendTx")
-  console.log("uuid =", uuid, "satsAmount=", satsAmount);
+  console.log("ordWallet =", ordWallet, "satsAmount=", satsAmount);
   const privateKey = infoItem.infokey;
   console.log("privateKey=", privateKey);
   let account;

@@ -11,19 +11,19 @@ https://inscribe.ordinal.art/api
 ```text
 POST
 https://inscribe.ordinal.art/api/users/getUserInfo
-uuid: string
+ordWallet: string
 actionDate: date
  
 POST
 https://inscribe.ordinal.art/api/users/getUserInscriptions
-uuid: string
+ordWallet: string
 
 GET
-https://inscribe.ordinal.art/api/users/getNotify?uuid=uuid
+https://inscribe.ordinal.art/api/users/getNotify?ordWallet=ordWallet
 
 POST
 https://inscribe.ordinal.art/api/users/removeNotify
-uuid: uuid
+ordWallet: ordWallet
 removeAll: false(one)/true(multiple)
 type: Number
 link: string

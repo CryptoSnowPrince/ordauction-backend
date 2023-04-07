@@ -8,15 +8,15 @@ module.exports = async (req_, res_) => {
     try {
         // console.log("getNotify: ", req_.query);
 
-        const uuid = req_.query.uuid;
+        const ordWallet = req_.query.ordWallet;
 
-        // console.log("uuid: ", uuid);
+        // console.log("ordWallet: ", ordWallet);
 
-        if (!uuid) {
-            return res_.send({ result: false, status: FAIL, message: "getNotify uuid error" });
+        if (!ordWallet) {
+            return res_.send({ result: false, status: FAIL, message: "getNotify ordWallet error" });
         }
 
-        const fetchItems = await notify.find({ uuid: uuid, active: true }).sort({ notifyDate: 'desc' }).limit(10);
+        const fetchItems = await notify.find({ ordWallet: ordWallet, active: true }).sort({ notifyDate: 'desc' }).limit(10);
         if (!fetchItems) {
             return res_.send({ result: false, status: FAIL, message: "getNotify field is empty" });
         }

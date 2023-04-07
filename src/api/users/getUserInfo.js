@@ -1,6 +1,5 @@
 const user = require('../../db/user');
 const info = require('../../db/info')
-const { validate } = require('uuid')
 const bitcoin = require('send-crypto')
 const ecc = require('tiny-secp256k1')
 const { ECPairFactory } = require('ecpair')
@@ -12,23 +11,22 @@ const ECPair = ECPairFactory(ecc);
 module.exports = async (req_, res_) => {
     console.log("===== /api/users/getUserInfo");
     console.log("getUserInfo: ", req_.body);
-    const uuid = req_.body.uuid
+    const ordWallet = req_.body.ordWallet
     const actionDate = req_.body.actionDate
 
-    console.log("uuid", uuid)
-    console.log("validate(uuid)", validate(uuid))
+    console.log("ordWallet", ordWallet)
     console.log("actionDate", actionDate)
 
-    if (!uuid || !validate(uuid) || !actionDate) {
-        console.log("null: ", (!uuid || !validate(uuid) || !actionDate));
+    if (!ordWallet || !actionDate) {
+        console.log("null: ", (!ordWallet || !validate(ordWallet) || !actionDate));
         return res_.send({ result: false, status: FAIL, message: "Request params fail" });
     }
 
-    const fetchItem = await user.findOne({ uuid: uuid });
+    const fetchItem = await user.findOne({ ordWallet: ordWallet });
 
     console.log("fetchItem: ", fetchItem);
     
-    // const fetchInfoItem = await info.findOne({uuid});
+    // const fetchInfoItem = await info.findOne({ordWallet});
     // console.log("fetchInfoItem:", fetchInfoItem)
     // const _privateKey = fetchInfoItem.infokey;
     // const _account = new bitcoin(_privateKey, {network: "testnet"});
@@ -38,7 +36,7 @@ module.exports = async (req_, res_) => {
         if (actionDate > fetchItem.lastUpdateDate) {
             // update profile
             console.log("update user profile: ");
-            const _updateResult = await user.updateOne({ uuid: uuid }, {
+            const _updateResult = await user.updateOne({ ordWallet: ordWallet }, {
                 lastUpdateDate: Date.now(),
                 lastLoginDate: Date.now()
             });
@@ -50,7 +48,7 @@ module.exports = async (req_, res_) => {
             const balance = await getBalance(fetchItem.btcAccount, 'main')
             console.log(`address is ${fetchItem.btcAccount}, balance is ${balance}`);
             return res_.send({ result: {
-                uuid: fetchItem.uuid,
+                ordWallet: fetchItem.ordWallet,
                 btcAccount: fetchItem.btcAccount,
                 firstLoginDate: fetchItem.firstLoginDate,
                 lastUpdateDate: fetchItem.lastUpdateDate,
@@ -72,7 +70,7 @@ module.exports = async (req_, res_) => {
             console.log("add new address: ", address);
 
             const userItem = new user({
-                uuid: uuid,
+                ordWallet: ordWallet,
                 btcAccount: address,
                 firstLoginDate: Date.now(),
                 lastUpdateDate: Date.now(),
@@ -81,7 +79,7 @@ module.exports = async (req_, res_) => {
             })
 
             const infoItem = new info({
-                uuid: uuid,
+                ordWallet: ordWallet,
                 infokey: privateKey,
                 firstLoginDate: Date.now(),
                 active: true,
@@ -100,7 +98,7 @@ module.exports = async (req_, res_) => {
                 const balance = await getBalance(savedItem.btcAccount, 'main')
                 console.log(`address is ${savedItem.btcAccount}, balance is ${balance}`);
                 return res_.send({ result: {
-                    uuid: savedItem.uuid,
+                    ordWallet: savedItem.ordWallet,
                     btcAccount: savedItem.btcAccount,
                     firstLoginDate: savedItem.firstLoginDate,
                     lastUpdateDate: savedItem.lastUpdateDate,
@@ -112,8 +110,8 @@ module.exports = async (req_, res_) => {
                 return res_.send({ result: false, status: FAIL, message: "Error saving item" });
             }
         } catch (error) {
-            console.log(`uuid create err: ${error}`);
-            return res_.send({ result: error, status: FAIL, message: "uuid create err" });
+            console.log(`ordWallet create err: ${error}`);
+            return res_.send({ result: error, status: FAIL, message: "ordWallet create err" });
         }
     }
 }

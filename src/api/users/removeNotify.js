@@ -8,17 +8,17 @@ module.exports = async (req_, res_) => {
     try {
         console.log("===== /api/users/removeNotify ");
 
-        const uuid = req_.body.uuid;
+        const ordWallet = req_.body.ordWallet;
         const removeAll = req_.body.removeAll;
 
-        if (!uuid) {
+        if (!ordWallet) {
             console.log("Request params failed");
             return res_.send({ result: false, status: FAIL, message: "Request params failed" });
         }
 
         if (removeAll) {
             const _updateResult = await notify.updateMany({
-                uuid: uuid,
+                ordWallet: ordWallet,
                 active: true
             }, { active: false });
             if (!_updateResult) {
@@ -30,7 +30,7 @@ module.exports = async (req_, res_) => {
         }
         // else {
         //     const _updateResult = await notify.updateOne({
-        //         uuid: uuid,
+        //         ordWallet: ordWallet,
         //         type: type,
         //         title: title,
         //         link: link,

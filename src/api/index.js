@@ -1,10 +1,10 @@
 const express = require('express');
 const users = require("./users");
-const collection = require("./collection");
+const auction = require("./auction");
 
 const router = express.Router();
 
 router.use("/users", users);
-router.use("/collection", collection);
+router.use("/auction", auction);
 
 module.exports = router;
