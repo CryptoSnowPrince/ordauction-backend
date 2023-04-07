@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
 
 const getBidHistory = require('./getBidHistory');
 const bid = require("./bid");
+const estimate = require('./estimate');
 const createAuction = require('./createAuction');
+const startAuction = require('./startAuction');
 const endAuction = require('./endAuction');
 
 const storage = multer.diskStorage({
@@ -23,8 +26,14 @@ router.get('/getBidHistory', getBidHistory);
 // bid
 router.post('/bid', bid);
 
+// estimate
+router.post('/estimate', upload.single('file'), estimate);
+
 // createAuction
-router.post('/createAuction', upload.array('files'), createAuction);
+router.post('/createAuction', upload.single('file'), createAuction);
+
+// startAuction
+router.post('/startAuction', startAuction);
 
 // endAuction
 router.post('/endAuction', endAuction);

@@ -1,170 +1,119 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const inscribe = require("../../db/inscribe");
+const auction = require("../../db/auction");
 const awaitExec = require("util").promisify(require("child_process").exec);
 const {
   SUCCESS,
   FAIL,
-  INSCRIBE_PENDING,
-  OUTPUT_UTXO,
-  SERVICE_FEE,
   addNotify,
   getDisplayString,
   timeEstimate,
-  sendSatsToAdmin,
-  INSCRIBE_FAILED,
-  INSCRIBE_COMPLETED,
+  AUCTION_CREATED,
 } = require("../../utils");
-const { ORD_COMMAND, IS_TESTNET } = require("../../utils/config");
 
 module.exports = async (req_, res_) => {
-  let filePaths = [];
+  let filePath = null;
   try {
-    console.log("===== /api/users/creatAuction");
-    console.log("File uploaded successfully");
-    filePaths = req_.files;
+    // console.log("creatAuction: ");
+    const { file } = req_;
+    filePath = file.path;
+    // console.log(file);
 
     const ordWallet = req_.body.ordWallet;
     const feeRate = req_.body.feeRate;
     const actionDate = req_.body.actionDate;
-    const btcAccount = req_.body.recipient;
-    console.log("files=", filePaths);
-    console.log("ordWallet: ", ordWallet, !ordWallet);
-    console.log("feeRate: ", feeRate, !feeRate);
-    console.log("actionDate: ", actionDate, !actionDate);
-    console.log("btcAccount: ", btcAccount, !btcAccount);
-    if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !feeRate || !actionDate || !btcAccount || filePaths.length === 0) {
+    const signData = req_.body.signData;
+
+    // console.log("ordWallet: ", ordWallet, !ordWallet);
+    // console.log("feeRate: ", feeRate, !feeRate);
+    // console.log("actionDate: ", actionDate, !actionDate);
+    // console.log("signData: ", signData, !signData);
+
+    if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !feeRate || !actionDate || !signData) {
       console.log("request params fail");
-      if (filePaths.length > 0) {
-        for (var index = 0; index < filePaths.length; index++) {
-          await awaitExec(`rm ${filePaths[index].path}`);
-        }
-      }
+      await awaitExec(`rm ${filePath}`);
       return res_.send({
         result: false,
         status: FAIL,
-        message: "Ruquest Params Failed.",
+        message: "request params fail",
       });
     }
 
-    var fees = 0;
-    for (var index = 0; index < filePaths.length; index++) {
-      const { stdout, stderr } = await awaitExec(
-        `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePaths[index].path} --destination ${btcAccount} --dry-run`
-      );
-      if (stderr) {
-        for (var index = 0; index < filePaths.length; index++) {
-          await awaitExec(`rm ${filePaths[index].path}`);
-        }
-        return res_.send({
-          result: false,
-          status: FAIL,
-          message: "Estimate inscribe error. Please try again later.",
-        });
-      }
-      fees += parseInt(JSON.parse(stdout).fees)
-    }
-    console.log("fees=", fees);
+    /////////////////////////////
+    // verification sign
+    // TODO
+    /////////////////////////////
 
-    const estimateSatsAmount = fees + SERVICE_FEE + OUTPUT_UTXO * filePaths.length;
-    const retVal = await sendSatsToAdmin(ordWallet, estimateSatsAmount);
-    console.log("sendSatsToAdmin: retVal=", retVal);
-    if(!retVal) {
-      for (var index = 0; index < filePaths.length; index++) {
-        await awaitExec(`rm ${filePaths[index].path}`);
-      }
+    /////////////////////////////
+    // verification admin
+    // TODO
+    /////////////////////////////
+
+    const estimateFees = await awaitExec(
+      `ord wallet inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
+    );
+    if (estimateFees.stderr) {
+      await awaitExec(`rm ${filePath}`);
       return res_.send({
         result: false,
         status: FAIL,
-        message: "You don't have enough sats.",
+        message: "inscribe estimateInscribe stderr",
       });
     }
-    console.log("=== start inscribing...")
-    for (var index = 0; index < filePaths.length; index++) {
-      console.log(`Before start inscribing: path=${filePaths[index].path}`);
-      const { stdout, stderr } = await awaitExec(
-        `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePaths[index].path} --destination ${btcAccount}`
+
+    // createAuction
+    const inscribeReturn = await awaitExec(
+      `ord wallet inscribe --fee-rate ${feeRate} ${filePath}`
+    );
+
+    if (inscribeReturn.stderr) {
+      console.log(
+        "ord wallet inscriptions stderr: ",
+        inscribeReturn.stderr
       );
-      console.log("stdout=", stdout);
-      console.log("stderr=", stderr);
-      if (stderr) {
-        // const fetchItem = await inscribe.updateOne({
-        //   _id: inscribeItem._id
-        // }, {
-        //   state: INSCRIBE_FAILED
-        // }, (err, docs) => {
-        //   if(err) {
-        //     console.log("UpdateOne Error: ", err);
-        //   } else {
-        //     console.log("Updated inscribe status to FAILED.");
-        //   }
-        // });
-        for (var index = 0; index < filePaths.length; index++) {
-          await awaitExec(`rm ${filePaths[index].path}`);
-        }
-        return res_.send({
-          result: false,
-          status: FAIL,
-          message: "Inscribe error",
-        });
-      }
-
-      const btcTxHash = JSON.parse(stdout).commit;
-      const inscriptionID = JSON.parse(stdout).inscription;
-      console.log("btcTxHash=", btcTxHash, "inscriptionID=", inscriptionID);
-
-      // await awaitExec(`mv ${filePaths[index].path} ./minted`);
-      // console.log(`mv ${filePaths[index].path} ./minted`);
-      // const fetchItem = await inscribe.updateOne({
-      //   _id: inscribeItem._id
-      // }, {
-      //   state: INSCRIBE_COMPLETED
-      // }, (err, docs) => {
-      //   if(err) {
-      //     console.log("UpdateOne Error: ", err);
-      //   } else {
-      //     console.log("Updated inscribe status to Completed.");
-      //   }
-      // });
-      const inscribeItem = new inscribe({
-        ordWallet: ordWallet,
-        feeRate: feeRate,
-        btcDestination: btcAccount,
-        state: INSCRIBE_COMPLETED,
-        actionDate: actionDate,
-        path: filePaths[index].path,
-        txHash: btcTxHash,
-        inscriptionID: inscriptionID
-      });
-      const savedItem = await inscribeItem.save();
-
-      console.log("addNotify");
-      await addNotify(ordWallet, {
-        type: 0,
-        title: "Inscribe Success!",
-        link: `https://mempool.space/${IS_TESTNET?"testnet/":""}tx/${btcTxHash}`,
-        content: `Congratulations! Your inscription ${getDisplayString(
-          inscriptionID
-        )} will arrive to your wallet in ${timeEstimate(feeRate)}.`,
+      await awaitExec(`rm ${filePath}`);
+      return res_.send({
+        result: false,
+        status: FAIL,
+        message: "inscribe stderr",
       });
     }
 
-    for (var index = 0; index < filePaths.length; index++) {
-      await awaitExec(`rm ${filePaths[index].path}`);
-    }
+    // Main case
+    const btcTxHash = JSON.parse(inscribeReturn.stdout).commit;
+    const inscriptionID = JSON.parse(inscribeReturn.stdout).inscription;
+    console.log("ord inscribe btcTxHash stdout: ", btcTxHash);
+    console.log("ord inscribe inscriptionID stdout: ", inscriptionID);
+
+    const auctionItem = new auction({
+      inscriptionID: inscriptionID,
+      state: AUCTION_CREATED,
+    });
+
+    const savedItem = await auctionItem.save();
+    console.log("new auctionItem object saved: ", savedItem);
+
+    await addNotify(ordWallet, {
+      type: 0,
+      title: "Auction Create Success!",
+      link: `https://mempool.space/tx/${btcTxHash}`,
+      content: `Your inscription ${getDisplayString(
+        inscriptionID
+      )} will arrive to your wallet in ${timeEstimate(feeRate)}.`,
+    });
+
+    await awaitExec(`rm ${filePath}`);
     return res_.send({
       result: true,
       status: SUCCESS,
-      message: "Inscribed successfully",
+      message: "auction created",
     });
   } catch (error) {
-    console.log("inscribe catch error: ", error);
-    if (filePaths.length > 0) {
-      for (var index = 0; index < filePaths.length; index++) {
-        try {
-          await awaitExec(`rm ${filePaths[index].path}`);
-        } catch (error) { }
-      }
+    console.log("auction create catch error: ", error);
+    if (filePath) {
+      try {
+        await awaitExec(`rm ${filePath}`);
+      } catch (error) { }
     }
-    return res_.send({ result: false, status: FAIL, message: "Unexpected error. Please try again later." });
+    return res_.send({ result: false, status: FAIL, message: "Catch Error" });
   }
 };

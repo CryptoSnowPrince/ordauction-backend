@@ -14,8 +14,6 @@ module.exports = async (req_, res_) => {
 
         const ordWallet = req_.query.ordWallet;
 
-        // console.log("ordWallet: ", ordWallet);
-
         if (!ordWallet || !getAddressInfo(ordWallet).bech32) {
             return res_.send({ result: false, status: FAIL, message: "getNotify ordWallet error" });
         }
