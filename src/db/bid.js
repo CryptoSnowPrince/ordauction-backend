@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const bidSchema = new mongoose.Schema({
+    auctionID: { type: Number, default: 0 },
     inscriptionID: { type: String, default: "" },
     ordWallet: { type: String, default: "" },
     bidNumber: { type: Number, default: 0 },

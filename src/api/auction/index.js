@@ -6,6 +6,7 @@ const getBidHistory = require('./getBidHistory');
 const bid = require("./bid");
 const estimate = require('./estimate');
 const createAuction = require('./createAuction');
+const getEnableItems = require('./getEnableItems');
 const startAuction = require('./startAuction');
 const endAuction = require('./endAuction');
 
@@ -31,6 +32,9 @@ router.post('/estimate', upload.single('file'), estimate);
 
 // createAuction
 router.post('/createAuction', upload.single('file'), createAuction);
+
+// getEnableItems
+router.post('/getEnableItems', getEnableItems);
 
 // startAuction
 router.post('/startAuction', startAuction);

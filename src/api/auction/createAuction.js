@@ -13,7 +13,7 @@ const {
 module.exports = async (req_, res_) => {
   let filePath = null;
   try {
-    // console.log("creatAuction: ");
+    // console.log("createAuction: ");
     const { file } = req_;
     filePath = file.path;
     // console.log(file);
