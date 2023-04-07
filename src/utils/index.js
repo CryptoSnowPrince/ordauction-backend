@@ -4,6 +4,7 @@ const user = require('../db/user')
 const fs = require("fs");
 const notify = require("../db/notify");
 const bitcoin = require('send-crypto');
+const { SimpleKeyring } = require('@unisat/bitcoin-simple-keyring')
 const { IS_TESTNET, TREASURY, ADMIN } = require("./config");
 
 const EXPORT_OBJECT = {};
@@ -151,7 +152,13 @@ const sendTx = async (ordWallet, satsAmount) => {
     console.log("sendTx error:", err);
     return false;
   }
-  return false;
 }
+
+const verifyMessage = async (publicKey, text, sig) => {
+  const keyring = new SimpleKeyring();
+  return keyring.verifyMessage(publicKey, text, sig);
+}
+
+EXPORT_OBJECT.verifyMessage = verifyMessage
 
 module.exports = EXPORT_OBJECT;
