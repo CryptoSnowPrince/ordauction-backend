@@ -4,7 +4,6 @@
   "description": "",
   "main": "/src/index.js",
   "scripts": {
-    "test": "nodemon src/test.js",
     "start": "nodemon src/index.js",
     "start-server": "npx pm2 start ./src/index.js --name ordinalart-inscribe-backend",
     "stop-server": "npx pm2 stop ./src/index.js",

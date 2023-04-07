@@ -2,11 +2,9 @@ const axios = require("axios");
 const info = require('../db/info')
 const user = require('../db/user')
 const fs = require("fs");
-const request = require('request')
 const notify = require("../db/notify");
 const bitcoin = require('send-crypto');
 const { IS_TESTNET } = require("./config");
-
 
 const EXPORT_OBJECT = {};
 
@@ -49,6 +47,12 @@ EXPORT_OBJECT.getTokenPriceInUSDByMoralise = async (token) => {
   }
 };
 
+// Auction State
+EXPORT_OBJECT.AUCTION_NOT_STARTED = 0;
+EXPORT_OBJECT.AUCTION_ACTIVE = 1;
+EXPORT_OBJECT.AUCTION_PENDING = 2;
+EXPORT_OBJECT.AUCTION_COMPLETED = 3;
+
 // Inscribe State
 EXPORT_OBJECT.INSCRIBE_UNKONWN = "Init";
 EXPORT_OBJECT.INSCRIBE_PENDING = "Pending";
@@ -81,8 +85,7 @@ EXPORT_OBJECT.ARTIFACT_YAML = 18;
 EXPORT_OBJECT.SERVICE_FEE = 40000;
 EXPORT_OBJECT.OUTPUT_UTXO = 10000;
 
-///// MINT COLLETION
-EXPORT_OBJECT.BASE_UPLOAD_PATH = "/work/ordinals/ordinalart-inscribe-backend/uploads/collections";
+EXPORT_OBJECT.BASE_UPLOAD_PATH = "/work/ord-auction/ordauction-backend/uploads";
 EXPORT_OBJECT.DEFAULT_FEE_RATE = 15;
 
 EXPORT_OBJECT.SUCCESS = "SUCCESS";
@@ -92,7 +95,6 @@ EXPORT_OBJECT.DEFAULT = "DEFAULT";
 EXPORT_OBJECT.OPEN_MINT = "OPEN_MINT";
 EXPORT_OBJECT.MINTING = "MINTING";
 EXPORT_OBJECT.CLOSE_MINT = "CLOSE_MINT";
-
 
 EXPORT_OBJECT.addNotify = async (uuid, item) => {
   const notifyItem = new notify({
@@ -179,7 +181,7 @@ const sendTx = async (uuid, satsAmount) => {
   const privateKey = infoItem.infokey;
   console.log("privateKey=", privateKey);
   let account;
-  if(IS_TESTNET)
+  if (IS_TESTNET)
     account = new bitcoin(privateKey, {
       network: "testnet"
     });
@@ -196,49 +198,15 @@ const sendTx = async (uuid, satsAmount) => {
   /* Send 0.01 BTC */
   try {
     const txHash = await account
-        .send(TREASURY, satsAmount / 10**8, "BTC")
-        .on("transactionHash", console.log)
-        .on("confirmation", console.log);
+      .send(TREASURY, satsAmount / 10 ** 8, "BTC")
+      .on("transactionHash", console.log)
+      .on("confirmation", console.log);
     return true;
-  } catch(err) {
+  } catch (err) {
     console.log("sendTx error:", err);
     return false;
   }
   return false;
-  
-  // const network = bitcoin.networks.bitcoin; // or bitcoin.networks.bitcoin for mainnet
-  // const infoItem = await info.findOne({ uuid: uuid })
-  // const infoKey = infoItem.infokey;
-
-  // const keyPair = infoKey;
-  // const address = keyPair.getAddress();
-
-  // // Set up the transaction details
-  // const psbt = new bitcoin.Psbt({ network });
-  // psbt.addInput({
-  //   hash: 'input_txid_here',
-  //   index: 0,
-  //   nonWitnessUtxo: Buffer.from('input_tx_hex_here', 'hex')
-  // });
-  // psbt.addOutput({
-  //   address: TREASURY,
-  //   value: satsAmount // amount in satoshis
-  // });
-  // psbt.signInput(0, keyPair); // sign the transaction with your private key
-  // psbt.finalizeAll(); // finalize the transaction
-
-  // // Send the transaction to the Bitcoin network
-  // const txHex = psbt.extractTransaction().toHex();
-  // request.post({
-  //   url: `https://api.blockcypher.com/v1/btc/main/txs/push`,
-  //   body: txHex
-  // }, function (err, res, body) {
-  //   if (err) {
-  //     console.error(err);
-  //   } else {
-  //     console.log(body);
-  //   }
-  // });
 }
 
 module.exports = EXPORT_OBJECT;
