@@ -7,7 +7,8 @@ const {
   AUCTION_CREATED,
   AUCTION_STARTED,
   AUCTION_ENDED,
-  ADMIN
+  ADMIN,
+  verifyMessage
 } = require("../../utils");
 
 module.exports = async (req_, res_) => {
@@ -18,15 +19,19 @@ module.exports = async (req_, res_) => {
     const inscriptionID = req_.body.inscriptionID;
     const duration = req_.body.duration;
     const actionDate = req_.body.actionDate;
+    const plainText = req_.body.plainText;
+    const publicKey = req_.body.publicKey;
     const signData = req_.body.signData;
 
     // console.log("ordWallet: ", ordWallet, !ordWallet);
     // console.log("inscriptionID: ", inscriptionID, !inscriptionID);
     // console.log("duration: ", duration, !duration);
     // console.log("actionDate: ", actionDate, !actionDate);
+    // console.log("plainText: ", plainText, !plainText);
+    // console.log("publicKey: ", publicKey, !publicKey);
     // console.log("signData: ", signData, !signData);
 
-    if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !duration || !inscriptionID || !actionDate || !signData) {
+    if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !duration || !inscriptionID || !actionDate || !plainText || !publicKey || !signData) {
       console.log("request params fail");
       return res_.send({
         result: false,
@@ -35,10 +40,12 @@ module.exports = async (req_, res_) => {
       });
     }
 
-    /////////////////////////////
-    // verification sign
-    // TODO
-    /////////////////////////////
+    // Verify Sign
+    const verifySignRetVal = await verifyMessage(publicKey, plainText, signData)
+    console.log("verifyMessage verifySignRetVal: ", verifySignRetVal);
+    if (!verifySignRetVal) {
+      return res_.send({ result: false, status: FAIL, message: "signature fail" });
+    }
 
     // verification admin
     if (ordWallet !== ADMIN) {

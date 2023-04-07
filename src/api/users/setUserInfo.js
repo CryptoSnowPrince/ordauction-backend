@@ -3,29 +3,34 @@ const user = require('../../db/user');
 const info = require('../../db/info')
 const bitcoin = require('send-crypto')
 
-const { SUCCESS, FAIL, getBalance } = require('../../utils');
-const { IS_TESTNET } = require('../../utils/config');
+const { SUCCESS, FAIL, getBalance, verifyMessage, IS_TESTNET } = require('../../utils');
 
 module.exports = async (req_, res_) => {
     try {
-
         console.log("===== /api/users/setUserInfo", req_.body);
         const ordWallet = req_.body.ordWallet
-        const signData = req_.body.actionDate
-        const publicKey = req_.body.actionDate
+        const actionDate = req_.body.actionDate
+        const plainText = req_.body.plainText
+        const publicKey = req_.body.publicKey
+        const signData = req_.body.signData
 
         console.log("ordWallet", ordWallet)
         console.log("actionDate", actionDate)
+        console.log("plainText", plainText)
+        console.log("publicKey", publicKey)
+        console.log("signData", signData)
 
-        if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !actionDate || !signData || !publicKey) {
-            console.log("null: ", (!ordWallet || !getAddressInfo(ordWallet).bech32 || !actionDate || !signData || !publicKey));
+        if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !actionDate || !plainText || !publicKey || !signData) {
+            console.log("null: ", (!ordWallet || !getAddressInfo(ordWallet).bech32 || !actionDate || !plainText || !publicKey || !signData));
             return res_.send({ result: false, status: FAIL, message: "Request params fail" });
         }
 
-        /////////////////////
         // Verify Sign
-        // TODO
-        /////////////////////
+        const verifySignRetVal = await verifyMessage(publicKey, plainText, signData)
+        console.log("verifyMessage verifySignRetVal: ", verifySignRetVal);
+        if (!verifySignRetVal) {
+            return res_.send({ result: false, status: FAIL, message: "signature fail" });
+        }
 
         const fetchItem = await user.findOne({ ordWallet: ordWallet });
 
