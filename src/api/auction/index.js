@@ -9,7 +9,8 @@ const createAuction = require('./createAuction');
 const getEnableItems = require('./getEnableItems');
 const startAuction = require('./startAuction');
 const endAuction = require('./endAuction');
-const getCurAuction = require('./getCurAuction');
+const getAuctionData = require('./getAuctionData');
+const getBidData = require('./getBidData');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -43,7 +44,10 @@ router.post('/startAuction', startAuction);
 // endAuction
 router.post('/endAuction', endAuction);
 
-// getCurAuction
-router.post('/getCurAuction', getCurAuction);
+// getAuctionData
+router.post('/getAuctionData', getAuctionData);
+
+// getBidData
+router.post('/getBidData', getBidData);
 
 module.exports = router;

@@ -4,9 +4,7 @@ const {
   SUCCESS,
   FAIL,
   addNotify,
-  AUCTION_CREATED,
   AUCTION_STARTED,
-  AUCTION_ENDED,
 } = require("../../utils");
 const bid = require('../../db/bid');
 
