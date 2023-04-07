@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const notifySchema = new mongoose.Schema(
     {
-        uuid: { type: String, default: "" }, // uuid
+        ordWallet: { type: String, default: "" },
         type: { type: Number, default: -1 },
         title: { type: String, default: '' },
         link: { type: String, default: '' },
