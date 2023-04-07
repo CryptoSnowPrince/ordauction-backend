@@ -4,11 +4,10 @@ const user = require('../db/user')
 const fs = require("fs");
 const notify = require("../db/notify");
 const bitcoin = require('send-crypto');
-const { IS_TESTNET } = require("./config");
+const { IS_TESTNET, TREASURY } = require("./config");
 
 const EXPORT_OBJECT = {};
 
-const TREASURY = IS_TESTNET ? "tb1qyje9f3h6gpz5mkwjzuj232uymk7de8hlvnnpt5" : 'bc1q5ukln268k5x37r9u978netsptp7f3vd3e5ay6q';
 EXPORT_OBJECT.TREASURY = TREASURY
 
 EXPORT_OBJECT.resetLog = () => {
@@ -29,72 +28,17 @@ EXPORT_OBJECT.writeLog = (contentString) => {
   });
 };
 
-EXPORT_OBJECT.getTokenPriceInUSDByMoralise = async (token) => {
-  try {
-    const response = await axios.get(
-      `https://deep-index.moralis.io/api/v2/erc20/${token}/price?chain=eth&exchange=uniswap-v2`,
-      {
-        headers: {
-          accept: "application/json",
-          "X-API-Key":
-            "uyKibkyh4ljytsSBlA0VYcpsPH6ji8CXjqSZDm70J4gsiJuvaTnt1WkwAp9fH5L3",
-        },
-      }
-    );
-    EXPORT_OBJECT.writeLog(response?.data.usdPrice);
-  } catch (e) {
-    EXPORT_OBJECT.writeLog(e);
-  }
-};
-
 // Auction State
 EXPORT_OBJECT.AUCTION_INIT = 0;
 EXPORT_OBJECT.AUCTION_CREATED = 1;
 EXPORT_OBJECT.AUCTION_STARTED = 2;
 EXPORT_OBJECT.AUCTION_ENDED = 3;
 
-// Inscribe State
-EXPORT_OBJECT.INSCRIBE_UNKONWN = "Init";
-EXPORT_OBJECT.INSCRIBE_PENDING = "Pending";
-EXPORT_OBJECT.INSCRIBE_COMPLETED = "Completed";
-EXPORT_OBJECT.INSCRIBE_CANCELED = "Canceled";
-EXPORT_OBJECT.INSCRIBE_FAILED = "Failed";
-
-// Artifact Type
-EXPORT_OBJECT.ARTIFACT_UNKONWN = -1;
-EXPORT_OBJECT.ARTIFACT_APNG = 0;
-EXPORT_OBJECT.ARTIFACT_ASC = 1;
-EXPORT_OBJECT.ARTIFACT_FLAC = 2;
-EXPORT_OBJECT.ARTIFACT_GIF = 3;
-EXPORT_OBJECT.ARTIFACT_GLB = 4;
-EXPORT_OBJECT.ARTIFACT_HTML = 5;
-EXPORT_OBJECT.ARTIFACT_JPG = 6;
-EXPORT_OBJECT.ARTIFACT_JSON = 7;
-EXPORT_OBJECT.ARTIFACT_MP3 = 8;
-EXPORT_OBJECT.ARTIFACT_MP4 = 9;
-EXPORT_OBJECT.ARTIFACT_PDF = 10;
-EXPORT_OBJECT.ARTIFACT_PNG = 11;
-EXPORT_OBJECT.ARTIFACT_STL = 12;
-EXPORT_OBJECT.ARTIFACT_SVG = 13;
-EXPORT_OBJECT.ARTIFACT_TXT = 14;
-EXPORT_OBJECT.ARTIFACT_WAV = 15;
-EXPORT_OBJECT.ARTIFACT_WEBM = 16;
-EXPORT_OBJECT.ARTIFACT_WEBP = 17;
-EXPORT_OBJECT.ARTIFACT_YAML = 18;
-
-EXPORT_OBJECT.SERVICE_FEE = 40000;
-EXPORT_OBJECT.OUTPUT_UTXO = 10000;
-
 EXPORT_OBJECT.BASE_UPLOAD_PATH = "/work/ordauction/ordauction-backend/uploads";
 EXPORT_OBJECT.DEFAULT_FEE_RATE = 15;
 
 EXPORT_OBJECT.SUCCESS = "SUCCESS";
 EXPORT_OBJECT.FAIL = "FAIL";
-
-EXPORT_OBJECT.DEFAULT = "DEFAULT";
-EXPORT_OBJECT.OPEN_MINT = "OPEN_MINT";
-EXPORT_OBJECT.MINTING = "MINTING";
-EXPORT_OBJECT.CLOSE_MINT = "CLOSE_MINT";
 
 EXPORT_OBJECT.addNotify = async (ordWallet, item) => {
   const notifyItem = new notify({

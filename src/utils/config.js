@@ -8,7 +8,7 @@ const MAINNET_EXPLORER = "https://ordinals.com";
 const EXPLORER_URL = IS_TESTNET ? TESTNET_EXPLORER : MAINNET_EXPLORER;
 EXPORT_OBJECT.EXPLORER_URL = EXPLORER_URL;
 
-const ORD_COMMAND = IS_TESTNET ? "ord -t --cookie-file /work/blockchain-node/bitcoin/testnet/testnet3/.cookie wallet": "ord wallet";
-EXPORT_OBJECT.ORD_COMMAND = ORD_COMMAND;
+const TREASURY = IS_TESTNET ? "tb1qyje9f3h6gpz5mkwjzuj232uymk7de8hlvnnpt5" : 'bc1q5ukln268k5x37r9u978netsptp7f3vd3e5ay6q';
+EXPORT_OBJECT.TREASURY = TREASURY;
 
 module.exports = EXPORT_OBJECT;

@@ -9,6 +9,7 @@ const {
   AUCTION_CREATED,
   AUCTION_STARTED,
   AUCTION_ENDED,
+  sendSatsToAdmin,
 } = require("../../utils");
 
 module.exports = async (req_, res_) => {
@@ -51,24 +52,16 @@ module.exports = async (req_, res_) => {
 
     const winnerItem = await bid.findOne({ auctionID: auctionID, bidNumber: fetchCurAuction.bidCounts })
 
-    const _updateResult = await auction.updateOne({
-      auctionID: auctionID,
-      state: AUCTION_STARTED
-    }, {
-      state: AUCTION_ENDED,
-      winnerOrdWallet: winnerItem.ordWallet,
-      amount: winnerItem.amount,
-      endDate: Date.now()
-    })
-
-    if (!_updateResult) {
-      return res_.send({ result: false, status: FAIL, message: "Update Error" });
-    }
-
-    /////////////////////////////
     // Send SatsAmounts to Admin
-    // TODO
-    /////////////////////////////
+    const retVal = await sendSatsToAdmin(winnerItem.ordWallet, winnerItem.amount);
+    console.log("sendSatsToAdmin: retVal=", retVal);
+    if (!retVal) {
+      return res_.send({
+        result: false,
+        status: FAIL,
+        message: "sendSatsToAdmin error",
+      });
+    }
 
     // Send Inscription to Winner
     const inscribeReturn = await awaitExec(
@@ -86,6 +79,20 @@ module.exports = async (req_, res_) => {
         status: FAIL,
         message: "send stderr",
       });
+    }
+
+    const _updateResult = await auction.updateOne({
+      auctionID: auctionID,
+      state: AUCTION_STARTED
+    }, {
+      state: AUCTION_ENDED,
+      winnerOrdWallet: winnerItem.ordWallet,
+      amount: winnerItem.amount,
+      endDate: Date.now()
+    })
+
+    if (!_updateResult) {
+      return res_.send({ result: false, status: FAIL, message: "Update Error" });
     }
 
     const btcTxHash = inscribeReturn.stdout;
