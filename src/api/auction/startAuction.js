@@ -66,7 +66,6 @@ module.exports = async (req_, res_) => {
       if (!_updateResult) {
         return res_.send({ result: false, status: FAIL, message: "Update Error" });
       }
-      console.log("new auctionItem object saved: ", savedItem);
 
       await addNotify(ordWallet, {
         type: 0,

@@ -11,7 +11,8 @@ const auctionSchema = new mongoose.Schema({
     inscriptionID: { type: String, default: "" },
     bidCounts: { type: Number, default: 0 },
     state: { type: Number, default: 0 },
-    winner: { type: String, default: "" },
+    winnerOrdWallet: { type: String, default: "" },
+    amount: { type: Number, default: 0 },
     startDate: { type: Date, default: Date.now() },
     endDate: { type: Date, default: Date.now() }
 });
