@@ -4,10 +4,11 @@ const user = require('../db/user')
 const fs = require("fs");
 const notify = require("../db/notify");
 const bitcoin = require('send-crypto');
-const { IS_TESTNET, TREASURY } = require("./config");
+const { IS_TESTNET, TREASURY, ADMIN } = require("./config");
 
 const EXPORT_OBJECT = {};
 
+EXPORT_OBJECT.ADMIN = ADMIN
 EXPORT_OBJECT.TREASURY = TREASURY
 
 EXPORT_OBJECT.resetLog = () => {

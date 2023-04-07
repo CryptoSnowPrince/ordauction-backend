@@ -7,6 +7,7 @@ const {
   AUCTION_CREATED,
   AUCTION_STARTED,
   AUCTION_ENDED,
+  ADMIN
 } = require("../../utils");
 
 module.exports = async (req_, res_) => {
@@ -39,10 +40,10 @@ module.exports = async (req_, res_) => {
     // TODO
     /////////////////////////////
 
-    /////////////////////////////
     // verification admin
-    // TODO
-    /////////////////////////////
+    if (ordWallet !== ADMIN) {
+      return res_.send({ result: false, status: FAIL, message: "Not Admin" });
+    }
 
     // Verify Current Auction State
     const fetchCurAuction = await auction.findOne({ state: AUCTION_STARTED })

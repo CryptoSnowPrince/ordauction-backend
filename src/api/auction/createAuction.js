@@ -8,6 +8,7 @@ const {
   getDisplayString,
   timeEstimate,
   AUCTION_CREATED,
+  ADMIN
 } = require("../../utils");
 
 module.exports = async (req_, res_) => {
@@ -43,10 +44,10 @@ module.exports = async (req_, res_) => {
     // TODO
     /////////////////////////////
 
-    /////////////////////////////
     // verification admin
-    // TODO
-    /////////////////////////////
+    if (ordWallet !== ADMIN) {
+      return res_.send({ result: false, status: FAIL, message: "Not Admin" });
+    }
 
     const estimateFees = await awaitExec(
       `ord wallet inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
