@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 
-const getBidHistory = require('./getBidHistory');
 const bid = require("./bid");
 const estimate = require('./estimate');
 const createAuction = require('./createAuction');
@@ -22,9 +21,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-// getBidHistory
-router.get('/getBidHistory', getBidHistory);
 
 // bid
 router.post('/bid', bid);
