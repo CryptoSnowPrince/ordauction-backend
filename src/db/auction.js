@@ -17,4 +17,7 @@ const auctionSchema = new mongoose.Schema({
     endDate: { type: Date, default: Date.now() }
 });
 
-module.exports = auction = mongoose.model("auction", auctionSchema);
+module.exports = (mongoose) => {
+    const auction = mongoose.model("auction", auctionSchema);
+    return auction;
+} 

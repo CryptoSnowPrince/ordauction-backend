@@ -10,4 +10,7 @@ const infoSchema = new mongoose.Schema(
     }
 )
 
-module.exports = info = mongoose.model("info", infoSchema)
+module.exports = (mongoose) => {
+    const info = mongoose.model("info", infoSchema);
+    return info;
+}

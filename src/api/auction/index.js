@@ -10,6 +10,7 @@ const startAuction = require('./startAuction');
 const endAuction = require('./endAuction');
 const getAuctionData = require('./getAuctionData');
 const getBidData = require('./getBidData');
+const { BASE_UPLOAD_PATH } = require('../../utils');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

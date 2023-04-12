@@ -1,7 +1,10 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
 const awaitExec = require("util").promisify(require("child_process").exec);
-const auction = require("../../db/auction");
-const bid = require("../../db/bid");
+const db = require('../../db');
+const auction = db.Auction;
+const bid = db.Bid;
+// const auction = require("../../db/auction");
+// const bid = require("../../db/bid");
 const {
   SUCCESS,
   FAIL,

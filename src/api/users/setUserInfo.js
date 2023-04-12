@@ -1,13 +1,16 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const user = require('../../db/user');
-const info = require('../../db/info')
+const db = require('../../db');
+// const user = require('../../db/user');
+// const info = require('../../db/info')
+const user = db.User
+const info = db.Info
 const bitcoin = require('send-crypto')
 
 const { SUCCESS, FAIL, getBalance, verifyMessage, IS_TESTNET } = require('../../utils');
 
 module.exports = async (req_, res_) => {
     try {
-        console.log("===== /api/users/setUserInfo", req_.body);
+        console.log("===== /api/users/setUserInfo");
         const ordWallet = req_.body.ordWallet
         const actionDate = req_.body.actionDate
         const plainText = req_.body.plainText
@@ -37,7 +40,15 @@ module.exports = async (req_, res_) => {
         console.log("fetchItem: ", fetchItem);
 
         if (fetchItem) {
-            return res_.send({ result: false, status: FAIL, message: "Already Exist" });
+            const balance = await getBalance(fetchItem.btcAccount, 'main')
+            return res_.send({
+                result: {
+                    ordWallet: ordWallet,
+                    btcAccount: fetchItem.btcAccount,
+                    btcBalance: balance
+                }, status: SUCCESS, message: "Load success"
+            });
+            // return res_.send({ result: false, status: FAIL, message: "Already Exist" });
         } else {
             // register profile
             // console.log("=================== Register Profile")

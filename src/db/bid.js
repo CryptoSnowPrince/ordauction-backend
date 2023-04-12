@@ -9,4 +9,7 @@ const bidSchema = new mongoose.Schema({
     bidDate: { type: Date, default: Date.now() }
 });
 
-module.exports = bid = mongoose.model("bid", bidSchema);
+module.exports = (mongoose) => {
+    const bid = mongoose.model("bid", bidSchema);
+    return bid;
+}
