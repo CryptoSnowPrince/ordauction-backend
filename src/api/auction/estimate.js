@@ -1,7 +1,7 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
 const awaitExec = require("util").promisify(require("child_process").exec);
 const { SUCCESS, FAIL } = require("../../utils");
-const { ORD_COMMAND } = require('../../utils/config');
+const { ORD_COMMAND, TRANSFER_FEE } = require('../../utils/config');
 
 module.exports = async (req_, res_) => {
   let filePath = null;
@@ -45,7 +45,7 @@ module.exports = async (req_, res_) => {
     const totalFee = JSON.parse(stdout).fees;
     console.log(">>> Estimate success: fee=", totalFee);
     return res_.send({
-      result: totalFee,
+      result: totalFee + TRANSFER_FEE,
       status: SUCCESS,
       message: "Estimate success",
     });

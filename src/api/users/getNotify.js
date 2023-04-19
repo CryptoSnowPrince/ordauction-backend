@@ -23,23 +23,23 @@ module.exports = async (req_, res_) => {
 
         const fetchUserInfo = await user.findOne({ ordWallet: ordWallet, active: true });
         const balance = await getBalance(fetchUserInfo.btcAccount, 'main')
-        // if (fetchUserInfo.btcBalance > parseInt(balance)) {
-        //     console.log("addNotify");
-        //     await addNotify(ordWallet, {
-        //         type: 0,
-        //         title: "Sats Consumed successfully!",
-        //         link: `https://blockstream.info/address/${fetchUserInfo.btcAccount}`,
-        //         content: `Consumed Sats Amount is ${fetchUserInfo.btcBalance - parseInt(balance)}`,
-        //     });
-        // } else if (fetchUserInfo.btcBalance < parseInt(balance)) {
-        //     console.log("addNotify");
-        //     await addNotify(ordWallet, {
-        //         type: 0,
-        //         title: "Sats Deposited successfully!",
-        //         link: `https://blockstream.info/address/${fetchUserInfo.btcAccount}`,
-        //         content: `Deposited Sats Amount is ${parseInt(balance) - fetchUserInfo.btcBalance}`,
-        //     });
-        // }
+        if (fetchUserInfo.btcBalance > parseInt(balance)) {
+            console.log("addNotify");
+            await addNotify(ordWallet, {
+                type: 0,
+                title: "Sats Consumed successfully!",
+                link: `https://blockstream.info/address/${fetchUserInfo.btcAccount}`,
+                content: `Consumed Sats Amount is ${fetchUserInfo.btcBalance - parseInt(balance)}`,
+            });
+        } else if (fetchUserInfo.btcBalance < parseInt(balance)) {
+            console.log("addNotify");
+            await addNotify(ordWallet, {
+                type: 0,
+                title: "Sats Deposited successfully!",
+                link: `https://blockstream.info/address/${fetchUserInfo.btcAccount}`,
+                content: `Deposited Sats Amount is ${parseInt(balance) - fetchUserInfo.btcBalance}`,
+            });
+        }
 
         const fetchItems = await notify.find({ ordWallet: ordWallet, active: true }).sort({ notifyDate: 'desc' }).limit(10);
         if (!fetchItems) {
