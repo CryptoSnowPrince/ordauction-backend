@@ -13,7 +13,7 @@ const getBidData = require('./getBidData');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, BASE_UPLOAD_PATH);
+        cb(null, '/work/ordauction/ordauction-backend/uploads');
     },
     filename: function (req, file, cb) {
         cb(null, `${file.originalname}`);
