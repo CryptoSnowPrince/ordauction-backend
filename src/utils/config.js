@@ -1,6 +1,6 @@
 const EXPORT_OBJECT = {};
 
-const IS_TESTNET = true;
+const IS_TESTNET = false;
 EXPORT_OBJECT.IS_TESTNET = IS_TESTNET;
 
 const TESTNET_EXPLORER = "https://testnet.hariwhitedream.com";// "http://127.0.0.1:5000";
@@ -8,8 +8,8 @@ const MAINNET_EXPLORER = "https://ordinals.com";
 const EXPLORER_URL = IS_TESTNET ? TESTNET_EXPLORER : MAINNET_EXPLORER;
 EXPORT_OBJECT.EXPLORER_URL = EXPLORER_URL;
 
-const TREASURY = IS_TESTNET ? "tb1q8zcn0ackfwq0jd7fjrxgc0k07x2sv3cf0lh4s6" : 'bc1q5ukln268k5x37r9u978netsptp7f3vd3e5ay6q';
-const ADMIN = IS_TESTNET ? "tb1q8zcn0ackfwq0jd7fjrxgc0k07x2sv3cf0lh4s6" : 'bc1q5ukln268k5x37r9u978netsptp7f3vd3e5ay6q';
+const TREASURY = IS_TESTNET ? "tb1q8zcn0ackfwq0jd7fjrxgc0k07x2sv3cf0lh4s6" : 'bc1qakj552djms5p7gr3edp8we6rqaqqej970a2sal';
+const ADMIN = IS_TESTNET ? ["tb1q8zcn0ackfwq0jd7fjrxgc0k07x2sv3cf0lh4s6"] : ['bc1qakj552djms5p7gr3edp8we6rqaqqej970a2sal'];
 EXPORT_OBJECT.ADMIN = ADMIN;
 EXPORT_OBJECT.TREASURY = TREASURY;
 

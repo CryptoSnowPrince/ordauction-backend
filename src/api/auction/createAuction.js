@@ -53,7 +53,7 @@ module.exports = async (req_, res_) => {
     }
 
     // verification admin
-    if (ordWallet !== ADMIN) {
+    if (ADMIN.indexOf(ordWallet) == -1) {
       return res_.send({ result: false, status: FAIL, message: "Not Admin" });
     }
 
