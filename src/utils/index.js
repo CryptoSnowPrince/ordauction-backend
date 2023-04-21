@@ -1,8 +1,9 @@
 const axios = require("axios");
-const info = require('../db/info')
-const user = require('../db/user')
+const db = require('../db');
+const info = db.Info;
+const user = db.User;
 const fs = require("fs");
-const notify = require("../db/notify");
+const notify = db.Notify;
 const bitcoin = require('send-crypto');
 const { SimpleKeyring } = require('@unisat/bitcoin-simple-keyring')
 const { IS_TESTNET, TREASURY, ADMIN } = require("./config");

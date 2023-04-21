@@ -1,11 +1,11 @@
 {
-  "name": "ordinalart-inscribe-backend",
+  "name": "ordauction-backend",
   "version": "1.0.0",
   "description": "",
   "main": "/src/index.js",
   "scripts": {
     "start": "nodemon src/index.js",
-    "start-server": "npx pm2 start ./src/index.js --name ordinalart-inscribe-backend",
+    "start-server": "npx pm2 start ./src/index.js --name ordauction-backend",
     "stop-server": "npx pm2 stop ./src/index.js",
     "dev": "concurrently --kill-others \"npm run start_server\" \"npm run start_db\"",
     "start_db": "mongod --dbpath ./db"
@@ -40,6 +40,7 @@
     "request": "^2.88.2",
     "send-crypto": "^0.2.38",
     "set-interval-async": "^2.0.3",
+    "socket.io": "^4.4.1",
     "tiny-secp256k1": "^2.2.1",
     "util": "^0.12.5"
   }

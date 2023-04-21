@@ -1,5 +1,9 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const auction = require("../../db/auction");
+const db = require('../../db');
+const auction = db.Auction;
+const bid = db.Bid;
+// const auction = require("../../db/auction");
+// const bid = require('../../db/bid');
 const {
   SUCCESS,
   FAIL,
@@ -7,7 +11,7 @@ const {
   AUCTION_STARTED,
   verifyMessage
 } = require("../../utils");
-const bid = require('../../db/bid');
+const { EXPLORER_URL } = require('../../utils/config');
 
 module.exports = async (req_, res_) => {
   try {
@@ -61,6 +65,8 @@ module.exports = async (req_, res_) => {
       if (!lastBid) {
         return res_.send({ result: false, status: FAIL, message: "Can't find last bid!" });
       }
+      console.log('lastBid=', lastBid);
+      console.log("actionDate=", actionDate)
       if (lastBid.bidDate > actionDate) {
         return res_.send({ result: false, status: FAIL, message: "You are late to bid, please bid again!" });
       }
@@ -83,9 +89,10 @@ module.exports = async (req_, res_) => {
         bidDate: Date.now()
       }
     )
-
+    console.log("bitItem=", bidItem);
     const _saveResult = await bidItem.save()
-    if (_saveResult) {
+    console.log("_saveResult=", _saveResult);
+    if (!_saveResult) {
       return res_.send({ result: false, status: FAIL, message: "New Bid Save Err" });
     }
 
@@ -94,17 +101,18 @@ module.exports = async (req_, res_) => {
       inscriptionID: fetchCurAuction.inscriptionID,
       state: AUCTION_STARTED
     }, {
-      bidCounts: (fetchCurAuction.bidCounts + 1)
-    })
+      bidCounts: (fetchCurAuction.bidCounts + 1),
+      amount: amount
+    });
 
-    if (_updateResult) {
+    if (!_updateResult) {
       return res_.send({ result: false, status: FAIL, message: "Update Auction State Err" });
     }
 
     await addNotify(ordWallet, {
       type: 0,
       title: "New Bid!",
-      link: `https://ordinals.com/inscription/${fetchCurAuction.inscriptionID}`,
+      link: `${EXPLORER_URL}/inscription/${fetchCurAuction.inscriptionID}`,
       content: `New Bid Placed!`,
     });
 

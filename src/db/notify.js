@@ -12,4 +12,7 @@ const notifySchema = new mongoose.Schema(
     }
 )
 
-module.exports = notify = mongoose.model("notify", notifySchema)
+module.exports = (mongoose) => {
+    const notify = mongoose.model("notify", notifySchema);
+    return notify;
+}

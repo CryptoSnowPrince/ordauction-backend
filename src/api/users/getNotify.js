@@ -1,6 +1,9 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const notify = require('../../db/notify');
-const user = require('../../db/user');
+const db = require('../../db');
+const notify = db.Notify;
+const user = db.User;
+// const notify = require('../../db/notify');
+// const user = require('../../db/user');
 const {
     SUCCESS,
     FAIL,

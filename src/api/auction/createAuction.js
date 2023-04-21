@@ -1,5 +1,7 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const auction = require("../../db/auction");
+const db = require('../../db');
+const auction = db.Auction
+// const auction = require("../../db/auction");
 const awaitExec = require("util").promisify(require("child_process").exec);
 const {
   SUCCESS,
@@ -11,15 +13,14 @@ const {
   ADMIN,
   verifyMessage
 } = require("../../utils");
+const { ORD_COMMAND, IS_TESTNET } = require('../../utils/config');
 
 module.exports = async (req_, res_) => {
   let filePath = null;
   try {
-    // console.log("createAuction: ");
+    console.log("===== /api/auction/createAuction: ");
     const { file } = req_;
     filePath = file.path;
-    // console.log(file);
-
     const ordWallet = req_.body.ordWallet;
     const feeRate = req_.body.feeRate;
     const actionDate = req_.body.actionDate;
@@ -52,12 +53,12 @@ module.exports = async (req_, res_) => {
     }
 
     // verification admin
-    if (ordWallet !== ADMIN) {
+    if (ADMIN.indexOf(ordWallet) == -1) {
       return res_.send({ result: false, status: FAIL, message: "Not Admin" });
     }
 
     const estimateFees = await awaitExec(
-      `ord wallet inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
+      `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
     );
     if (estimateFees.stderr) {
       await awaitExec(`rm ${filePath}`);
@@ -70,12 +71,12 @@ module.exports = async (req_, res_) => {
 
     // createAuction
     const inscribeReturn = await awaitExec(
-      `ord wallet inscribe --fee-rate ${feeRate} ${filePath}`
+      `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePath}`
     );
 
     if (inscribeReturn.stderr) {
       console.log(
-        "ord wallet inscriptions stderr: ",
+        `${ORD_COMMAND} inscriptions stderr: `,
         inscribeReturn.stderr
       );
       await awaitExec(`rm ${filePath}`);
@@ -103,7 +104,7 @@ module.exports = async (req_, res_) => {
     await addNotify(ordWallet, {
       type: 0,
       title: "Auction Create Success!",
-      link: `https://mempool.space/tx/${btcTxHash}`,
+      link: `https://mempool.space/${IS_TESTNET?"testnet/":""}tx/${btcTxHash}`,
       content: `Your inscription ${getDisplayString(
         inscriptionID
       )} will arrive to your wallet in ${timeEstimate(feeRate)}.`,

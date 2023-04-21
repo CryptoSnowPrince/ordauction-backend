@@ -1,5 +1,7 @@
 const { getAddressInfo } = require('bitcoin-address-validation')
-const auction = require("../../db/auction");
+const db = require('../../db');
+const auction = db.Auction;
+// const auction = require("../../db/auction");
 const {
   SUCCESS,
   FAIL,
@@ -10,6 +12,7 @@ const {
   ADMIN,
   verifyMessage
 } = require("../../utils");
+const { EXPLORER_URL } = require('../../utils/config');
 
 module.exports = async (req_, res_) => {
   try {
@@ -48,7 +51,7 @@ module.exports = async (req_, res_) => {
     }
 
     // verification admin
-    if (ordWallet !== ADMIN) {
+    if (ADMIN.indexOf(ordWallet) == -1 ) {
       return res_.send({ result: false, status: FAIL, message: "Not Admin" });
     }
 
@@ -60,7 +63,9 @@ module.exports = async (req_, res_) => {
 
     const fetchItem = await auction.findOne({ inscriptionID: inscriptionID, state: AUCTION_CREATED });
     if (fetchItem) {
-      const cnt = await auction.find({ state: AUCTION_ENDED })
+      const endedItems = await auction.find({ state: AUCTION_ENDED })
+      const cnt = endedItems.length;
+      console.log(">>> AuctionId=", cnt + 1);
       const _updateResult = await auction.updateOne({
         inscriptionID: inscriptionID,
         state: AUCTION_CREATED
@@ -78,7 +83,7 @@ module.exports = async (req_, res_) => {
       await addNotify(ordWallet, {
         type: 0,
         title: "Auction Started!",
-        link: `https://ordinals.com/inscription/${inscriptionID}`,
+        link: `${EXPLORER_URL}/inscription/${inscriptionID}`,
         content: `Auction Started Successfully!`,
       });
 
@@ -96,6 +101,6 @@ module.exports = async (req_, res_) => {
     }
   } catch (error) {
     console.log("auction create catch error: ", error);
-    return res_.send({ result: false, status: FAIL, message: "Catch Error" });
+    return res_.send({ result: false, status: FAIL, message: "Auction create Catch Error" });
   }
 };
