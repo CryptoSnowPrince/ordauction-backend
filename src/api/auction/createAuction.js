@@ -37,7 +37,7 @@ module.exports = async (req_, res_) => {
 
     if (!ordWallet || !getAddressInfo(ordWallet).bech32 || !feeRate || !actionDate || !plainText || !publicKey || !signData) {
       console.log("request params fail");
-      await awaitExec(`rm ${filePath}`);
+      await awaitExec(`rm "${filePath}"`);
       return res_.send({
         result: false,
         status: FAIL,
@@ -61,7 +61,7 @@ module.exports = async (req_, res_) => {
       `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
     );
     if (estimateFees.stderr) {
-      await awaitExec(`rm ${filePath}`);
+      await awaitExec(`rm "${filePath}"`);
       return res_.send({
         result: false,
         status: FAIL,
@@ -79,7 +79,7 @@ module.exports = async (req_, res_) => {
         `${ORD_COMMAND} inscriptions stderr: `,
         inscribeReturn.stderr
       );
-      await awaitExec(`rm ${filePath}`);
+      await awaitExec(`rm "${filePath}"`);
       return res_.send({
         result: false,
         status: FAIL,
@@ -110,7 +110,7 @@ module.exports = async (req_, res_) => {
       )} will arrive to your wallet in ${timeEstimate(feeRate)}.`,
     });
 
-    await awaitExec(`rm ${filePath}`);
+    await awaitExec(`rm "${filePath}"`);
     return res_.send({
       result: true,
       status: SUCCESS,
@@ -120,7 +120,7 @@ module.exports = async (req_, res_) => {
     console.log("auction create catch error: ", error);
     if (filePath) {
       try {
-        await awaitExec(`rm ${filePath}`);
+        await awaitExec(`rm "${filePath}"`);
       } catch (error) { }
     }
     return res_.send({ result: false, status: FAIL, message: "Catch Error" });

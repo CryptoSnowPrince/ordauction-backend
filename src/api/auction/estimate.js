@@ -21,7 +21,7 @@ module.exports = async (req_, res_) => {
     if (!feeRate || !ordWallet || !getAddressInfo(ordWallet).bech32) {
       console.log("request params fail");
       if (filePath) {
-        await awaitExec(`rm ${filePath}`);
+        await awaitExec(`rm "${filePath}"`);
       }
       return res_.send({
         result: false,
@@ -33,7 +33,7 @@ module.exports = async (req_, res_) => {
       `${ORD_COMMAND} inscribe --fee-rate ${feeRate} ${filePath} --dry-run`
     );
     if (stderr) {
-      await awaitExec(`rm ${filePath}`);
+      await awaitExec(`rm "${filePath}"`);
       return res_.send({
         result: false,
         status: FAIL,
@@ -41,7 +41,7 @@ module.exports = async (req_, res_) => {
       });
     }
     // console.log("ord wallet inscriptions stdout: ", stdout);
-    await awaitExec(`rm ${filePath}`);
+    await awaitExec(`rm "${filePath}"`);
     const totalFee = JSON.parse(stdout).fees;
     console.log(">>> Estimate success: fee=", totalFee);
     return res_.send({
@@ -53,7 +53,7 @@ module.exports = async (req_, res_) => {
     console.log("Estimate catch error: ", error);
     if (filePath) {
       try {
-        await awaitExec(`rm ${filePath}`);
+        await awaitExec(`rm "${filePath}"`);
       } catch (error) {}
     }
     return res_.send({

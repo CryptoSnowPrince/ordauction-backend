@@ -84,7 +84,7 @@ module.exports = async (req_, res_) => {
         "ord wallet send stderr: ",
         inscribeReturn.stderr
       );
-      await awaitExec(`rm ${filePath}`);
+      await awaitExec(`rm "${filePath}"`);
       return res_.send({
         result: false,
         status: FAIL,
